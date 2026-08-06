@@ -12,7 +12,7 @@ type Config struct {
 
 type Service struct {
 	Name     string `yaml:"name"`
-	URl      string `yaml:"url"`
+	URL      string `yaml:"url"`
 	Interval int    `yaml:"interval"`
 }
 

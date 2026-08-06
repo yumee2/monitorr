@@ -1,8 +1,9 @@
 package main
 
 import (
-	"fmt"
+	"context"
 	"monitorr/internal/config"
+	"monitorr/internal/worker"
 )
 
 const cfgPath = "./config.yaml"
@@ -13,5 +14,5 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Printf("%v\n", cfg)
+	worker.StartWorker(context.TODO(), cfg.Services)
 }

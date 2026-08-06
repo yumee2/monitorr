@@ -13,5 +13,11 @@ interval to see if it's up or down. Built as a portfolio project.
 
 ## Status
 
-Skeleton only, nothing implemented yet.
-`
+- Config yaml reading is implemented
+- Worker goroutines are spawned to check each service
+
+# TODO
+- Correct context cancellation
+- Add waitgroups to wait for all workers to finish
+- Set and use checkedAt field
+- Write simple tests

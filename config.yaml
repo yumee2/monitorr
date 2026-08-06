@@ -1,8 +1,12 @@
 services:
   - name: google
     url: https://google.com
-    interval: 30
+    interval: 5
 
   - name: github
     url: http://github.com
-    interval: 20
+    interval: 10
+
+  - name: githubb
+    url: http://githubb.com
+    interval: 5
