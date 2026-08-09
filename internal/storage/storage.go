@@ -3,6 +3,8 @@ package storage
 import (
 	"context"
 	"database/sql"
+	"os"
+	"path/filepath"
 	"time"
 
 	_ "modernc.org/sqlite"
@@ -20,6 +22,12 @@ type Storage struct {
 }
 
 func NewSqliteRepository(dsnURI string) (*Storage, error) {
+	if dir := filepath.Dir(dsnURI); dir != "." {
+		if err := os.MkdirAll(dir, 0o755); err != nil {
+			return nil, err
+		}
+	}
+
 	db, err := sql.Open("sqlite", dsnURI)
 	if err != nil {
 		return nil, err
