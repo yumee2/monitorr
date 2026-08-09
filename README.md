@@ -13,7 +13,10 @@ interval to see if it's up or down. Built as a portfolio project.
 
 ## Status
 
-- Config yaml reading is implemented
+s- Config yaml reading is implemented
 - Worker goroutines are spawned to check each service
 
 # TODO
+- Data persistence
+- Computing uptime %
+- Add logger

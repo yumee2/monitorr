@@ -16,7 +16,12 @@ type connectionResult struct {
 	checkedAt  time.Time
 }
 
-func StartWorker(ctx context.Context, services []config.Service) {
+type StorageI interface {
+	SaveResult(ctx context.Context, serviceName string, isUp bool,
+		statusCode int, checkedAt time.Time) error
+}
+
+func StartWorker(ctx context.Context, services []config.Service, storage StorageI) {
 	result := make(chan connectionResult, len(services))
 	wg := &sync.WaitGroup{}
 
@@ -29,7 +34,12 @@ func StartWorker(ctx context.Context, services []config.Service) {
 	for {
 		select {
 		case res := <-result:
-			fmt.Printf("%s: up=%v, statusCode=%d, err=%v, checkedAt=%s\n", res.name, res.up, res.statusCode, res.err, res.checkedAt)
+			fmt.Printf("%s: up=%v, statusCode=%d, err=%v, checkedAt=%s\n",
+				res.name, res.up, res.statusCode, res.err, res.checkedAt)
+			err := storage.SaveResult(ctx, res.name, res.up, res.statusCode, res.checkedAt)
+			if err != nil {
+				fmt.Printf("failed to save result: %v\n", err)
+			}
 		case <-ctx.Done():
 			wg.Wait()
 			return
