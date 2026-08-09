@@ -18,11 +18,11 @@ func main() {
 		panic(err)
 	}
 
-	storage, err := storage.NewSqliteRepository("storage.db")
+	repo, err := storage.NewSqliteRepository("data/storage.db")
 	if err != nil {
 		panic(err)
 	}
-	defer storage.Close()
+	defer repo.Close()
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
@@ -30,7 +30,7 @@ func main() {
 
 	doneWorker := make(chan struct{})
 	go func() {
-		worker.StartWorker(ctx, cfg.Services, storage)
+		worker.StartWorker(ctx, cfg.Services, repo)
 		close(doneWorker)
 	}()
 
