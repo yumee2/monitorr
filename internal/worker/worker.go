@@ -13,12 +13,12 @@ type connectionResult struct {
 	up         bool
 	statusCode int
 	err        error
-	checkedAt  time.Time
+	checkedAt  int64
 }
 
 type StorageI interface {
 	SaveResult(ctx context.Context, serviceName string, isUp bool,
-		statusCode int, checkedAt time.Time) error
+		statusCode int, checkedAt int64) error
 }
 
 func StartWorker(ctx context.Context, services []config.Service, storage StorageI) {
@@ -34,7 +34,7 @@ func StartWorker(ctx context.Context, services []config.Service, storage Storage
 	for {
 		select {
 		case res := <-result:
-			fmt.Printf("%s: up=%v, statusCode=%d, err=%v, checkedAt=%s\n",
+			fmt.Printf("%s: up=%v, statusCode=%d, err=%v, checkedAt=%d\n",
 				res.name, res.up, res.statusCode, res.err, res.checkedAt)
 			err := storage.SaveResult(ctx, res.name, res.up, res.statusCode, res.checkedAt)
 			if err != nil {

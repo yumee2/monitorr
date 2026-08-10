@@ -32,25 +32,25 @@ func doCheck(ctx context.Context, name string, url string, results chan<- connec
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		sendResult(ctx, results, connectionResult{up: false, name: name, statusCode: 0,
-			err: err, checkedAt: time.Now().UTC()})
+			err: err, checkedAt: time.Now().Unix()})
 		return
 	}
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		sendResult(ctx, results, connectionResult{up: false, name: name, statusCode: 0,
-			err: err, checkedAt: time.Now().UTC()})
+			err: err, checkedAt: time.Now().Unix()})
 		return
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
 		sendResult(ctx, results, connectionResult{up: true, name: name, statusCode: resp.StatusCode,
-			err: nil, checkedAt: time.Now().UTC()})
+			err: nil, checkedAt: time.Now().Unix()})
 		return
 	}
 	sendResult(ctx, results, connectionResult{up: false, name: name, statusCode: resp.StatusCode,
-		err: nil, checkedAt: time.Now().UTC()})
+		err: nil, checkedAt: time.Now().Unix()})
 }
 
 func sendResult(ctx context.Context, results chan<- connectionResult, res connectionResult) {

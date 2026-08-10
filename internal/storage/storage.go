@@ -14,7 +14,7 @@ type ServiceStatus struct {
 	ServiceName string
 	IsUp        bool
 	StatusCode  int
-	CheckedAt   time.Time
+	CheckedAt   int64
 }
 
 type Storage struct {
@@ -47,7 +47,7 @@ func NewSqliteRepository(dsnURI string) (*Storage, error) {
                       name        TEXT NOT NULL,
                       is_up       BOOLEAN NOT NULL,
                       status_code INTEGER NOT NULL,
-                      checked_at  DATETIME NOT NULL
+                      checked_at  INTEGER NOT NULL
               );
               CREATE INDEX IF NOT EXISTS idx_services_name_checked_at ON checks (name, checked_at);
       `)
@@ -58,14 +58,13 @@ func NewSqliteRepository(dsnURI string) (*Storage, error) {
 	return &Storage{db: db}, nil
 }
 
-func (s *Storage) SaveResult(ctx context.Context, serviceName string, isUp bool, statusCode int, checkedAt time.Time) error {
+func (s *Storage) SaveResult(ctx context.Context, serviceName string, isUp bool, statusCode int, checkedAt int64) error {
 	_, err := s.db.Exec("INSERT INTO checks (name, is_up, status_code, checked_at) VALUES (?, ?, ?, ?)", serviceName, isUp, statusCode, checkedAt)
 	return err
 }
 
 func (s *Storage) FindAll(ctx context.Context, interval time.Duration) (map[string][]ServiceStatus, error) {
-	since := time.Now().Add(-interval)
-
+	since := time.Now().Add(-interval).Unix()
 	rows, err := s.db.QueryContext(ctx, "SELECT name, is_up, status_code, checked_at FROM checks WHERE checked_at >= ? ORDER BY name, checked_at", since)
 	if err != nil {
 		return nil, err
@@ -85,6 +84,56 @@ func (s *Storage) FindAll(ctx context.Context, interval time.Duration) (map[stri
 		return nil, err
 	}
 	return grouped, nil
+}
+
+func (s *Storage) CountUptime(ctx context.Context, serviceName string, interval time.Duration) (int, error) {
+	since := time.Now().Add(-interval).Unix()
+	rows, err := s.db.QueryContext(ctx, "SELECT COUNT(*) FROM checks WHERE name = ? AND is_up = TRUE AND checked_at >= ?", serviceName, since)
+	if err != nil {
+		return 0, err
+	}
+	defer rows.Close()
+
+	var count int
+	if rows.Next() {
+		if err := rows.Scan(&count); err != nil {
+			return 0, err
+		}
+	}
+	if err := rows.Err(); err != nil {
+		return 0, err
+	}
+
+	total, err := s.FindTotalByName(ctx, serviceName, interval)
+	if err != nil {
+		return 0, err
+	}
+	if len(total) == 0 {
+		return 0, nil
+	}
+	return (count * 100) / len(total), nil
+}
+
+func (s *Storage) FindTotalByName(ctx context.Context, serviceName string, interval time.Duration) ([]ServiceStatus, error) {
+	since := time.Now().Add(-interval).Unix()
+	rows, err := s.db.QueryContext(ctx, "SELECT name, is_up, status_code, checked_at FROM checks WHERE name = ? AND checked_at >= ? ORDER BY checked_at", serviceName, since)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var statuses []ServiceStatus
+	for rows.Next() {
+		var status ServiceStatus
+		if err := rows.Scan(&status.ServiceName, &status.IsUp, &status.StatusCode, &status.CheckedAt); err != nil {
+			return nil, err
+		}
+		statuses = append(statuses, status)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return statuses, nil
 }
 
 func (s *Storage) Close() error {
