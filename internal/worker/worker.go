@@ -16,12 +16,12 @@ type connectionResult struct {
 	checkedAt  int64
 }
 
-type StorageI interface {
+type ResultSaver interface {
 	SaveResult(ctx context.Context, serviceName string, isUp bool,
 		statusCode int, checkedAt int64) error
 }
 
-func StartWorker(ctx context.Context, services []config.Service, storage StorageI) {
+func StartWorker(ctx context.Context, services []config.Service, storage ResultSaver) {
 	result := make(chan connectionResult, len(services))
 	wg := &sync.WaitGroup{}
 
