@@ -17,6 +17,5 @@ interval to see if it's up or down. Built as a portfolio project.
 - Worker goroutines are spawned to check each service
 
 # TODO
-- Data persistence
-- Computing uptime %
+- Delete old check history
 - Add logger
