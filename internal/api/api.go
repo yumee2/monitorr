@@ -23,11 +23,26 @@ func NewHandler(storage CheckReader) *Handler {
 	return &Handler{repo: storage}
 }
 
-func (s *Handler) Routes() *http.ServeMux {
+func (s *Handler) Routes() http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /status", s.handleGetAllServices)
 	mux.HandleFunc("GET /status/{name}", s.handleGetStatusByName)
-	return mux
+	return withCORS(mux)
+}
+
+// withCORS allows the web client (served from a different origin/port in
+// dev) to call this read-only, unauthenticated API.
+func withCORS(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
 }
 
 func (s *Handler) handleGetAllServices(w http.ResponseWriter, r *http.Request) {
