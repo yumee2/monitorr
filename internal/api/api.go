@@ -30,8 +30,6 @@ func (s *Handler) Routes() http.Handler {
 	return withCORS(mux)
 }
 
-// withCORS allows the web client (served from a different origin/port in
-// dev) to call this read-only, unauthenticated API.
 func withCORS(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")

@@ -10,3 +10,8 @@ services:
   - name: githubb
     url: http://githubb.com
     interval: 5
+
+telegram:
+  botToken: "8745721723:AAEaqPczKkkyroML5xS6Y2mK8yF64grIobA"
+  chatID: "1804094825"
+  failureThreshold: 3

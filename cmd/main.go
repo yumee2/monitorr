@@ -5,10 +5,12 @@ import (
 	"log"
 	"monitorr/internal/api"
 	"monitorr/internal/config"
+	"monitorr/internal/notify"
 	"monitorr/internal/storage"
 	"monitorr/internal/worker"
 	"net/http"
 	"os"
+
 	"os/signal"
 	"syscall"
 	"time"
@@ -32,9 +34,14 @@ func main() {
 	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
 	ctx, cancel := context.WithCancel(context.Background())
 
+	var alerter worker.Alerter
+	if cfg.Telegram.BotToken != "" && cfg.Telegram.ChatID != "" {
+		alerter = notify.NewTelegramNotifier(cfg.Telegram.BotToken, cfg.Telegram.ChatID)
+	}
+
 	doneWorker := make(chan struct{})
 	go func() {
-		worker.StartWorker(ctx, cfg.Services, repo)
+		worker.StartWorker(ctx, cfg.Services, repo, alerter, cfg.Telegram.FailureThreshold)
 		close(doneWorker)
 	}()
 
