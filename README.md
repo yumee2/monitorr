@@ -47,11 +47,3 @@ Monitorr is a lightweight uptime monitoring tool written in Go that continuously
    - The HTTP API will expose service status and uptime metrics
    - Configure your frontend to consume the API endpoints
 
-## Status
-
-- Config and persist check history to compute uptime % are implemented
-- Worker goroutines are spawned to check each service
-
-# TODO
-- Delete old check history
-- Add logger
