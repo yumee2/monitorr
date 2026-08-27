@@ -12,6 +12,6 @@ services:
     interval: 5
 
 telegram:
-  botToken: "8745721723:AAEaqPczKkkyroML5xS6Y2mK8yF64grIobA"
-  chatID: "1804094825"
+  botToken: ""
+  chatID: ""
   failureThreshold: 3
