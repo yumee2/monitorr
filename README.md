@@ -3,6 +3,11 @@
 Uptime checker. Reads a list of services (URLs) and pings each one on an
 interval to see if it's up or down. Built as a portfolio project.
 
+<img width="900" alt="Screenshot from 2026-08-27 09-29-13" src="https://github.com/user-attachments/assets/f9961988-9d1d-4026-b7e6-f9853fb59c39" />
+<img width="900" alt="Screenshot from 2026-08-27 09-31-30" src="https://github.com/user-attachments/assets/a3ee4a88-b8c2-475e-9da4-8c4b33c67257" />
+
+
+
 ## Idea
 
 - config: list of `{name, url, interval}`
@@ -10,6 +15,7 @@ interval to see if it's up or down. Built as a portfolio project.
 - persist check history to compute uptime %
 - notify via Telegram bot on state change (up -> down, down -> up)
 - HTTP API exposing status + uptime %, for a frontend later
+
 
 ## Quick Description
 
