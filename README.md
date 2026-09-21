@@ -40,7 +40,7 @@ Monitorr — лёгкий инструмент мониторинга досту
 
 4. **Запуск приложенияn**
    ```bash
-   go run main.go
+   go run .\cmd\main.go
    ```
 
    Or build and run:
