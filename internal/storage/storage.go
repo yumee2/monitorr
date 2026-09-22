@@ -88,30 +88,28 @@ func (s *Storage) FindAll(ctx context.Context, interval time.Duration) (map[stri
 
 func (s *Storage) CountUptime(ctx context.Context, serviceName string, interval time.Duration) (int, error) {
 	since := time.Now().Add(-interval).Unix()
-	rows, err := s.db.QueryContext(ctx, "SELECT COUNT(*) FROM checks WHERE name = ? AND is_up = TRUE AND checked_at >= ?", serviceName, since)
+
+	var total, up int
+
+	err := s.db.QueryRowContext(
+		ctx,
+		`SELECT
+				COUNT(*),
+				COALESCE(SUM(CASE WHEN is_up = TRUE THEN 1 ELSE 0 END), 0)
+			 FROM checks
+			 WHERE name = ? AND checked_at >= ?`,
+		serviceName,
+		since,
+	).Scan(&total, &up)
 	if err != nil {
 		return 0, err
 	}
-	defer rows.Close()
 
-	var count int
-	if rows.Next() {
-		if err := rows.Scan(&count); err != nil {
-			return 0, err
-		}
-	}
-	if err := rows.Err(); err != nil {
-		return 0, err
-	}
-
-	total, err := s.FindTotalByName(ctx, serviceName, interval)
-	if err != nil {
-		return 0, err
-	}
-	if len(total) == 0 {
+	if total == 0 {
 		return 0, nil
 	}
-	return (count * 100) / len(total), nil
+
+	return up * 100 / total, nil
 }
 
 func (s *Storage) FindTotalByName(ctx context.Context, serviceName string, interval time.Duration) ([]ServiceStatus, error) {
