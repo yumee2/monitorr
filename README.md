@@ -1,5 +1,5 @@
 # monitorr
-[![CI](https://github.com/yumee2/monitorr/actions/workflows/ci.yml/badge.svg)](https://github.com/yumee2/monitorr/actions/workflows/ci.yml)
+[![CI](https://github.com/yumee2/monitorr/actions/workflows/ci.yml/badge.svg)](https://github.com/yumee2/monitorr/actions/workflows/ci.yml) </br>
 Инструмент для мониторинга доступности сервисов. Читает список сервисов (URL) и с заданным интервалом проверяет, доступны ли они. Реализован как pet-проект для портфолио.
 
 
