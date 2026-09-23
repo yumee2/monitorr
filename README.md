@@ -43,9 +43,9 @@ Monitorr — лёгкий инструмент мониторинга досту
    go run .\cmd\main.go
    ```
 
-   Or build and run:
+   Или build and run:
    ```bash
-   go build -o monitorr
+   go build -o monitorr.exe ./cmd
    ./monitorr
    ```
 
